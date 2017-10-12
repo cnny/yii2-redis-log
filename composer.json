@@ -20,5 +20,5 @@
             "cann\\yii\\log\\": "",
             "app\\commands\\": "commands"
         }
-    },
+    }
 }
