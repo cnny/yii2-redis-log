@@ -1,0 +1,24 @@
+{
+    "name": "cann/yii2-redis-log",
+    "description": "redis log extension of yii2",
+    "keywords": ["yii2", "framework", "basic", "project template"],
+    "license": "MIT",
+    "type": "yii2-extension",
+    "authors": [
+        {
+            "name": "Cann",
+            "email": "imcnny@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.5.0",
+        "yiisoft/yii2": "~2.0.10",
+        "yiisoft/yii2-redis": "^2.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "cann\\yii\\log\\": "",
+            "app\\commands\\": "commands"
+        }
+    },
+}
