@@ -18,7 +18,10 @@
     "autoload": {
         "psr-4": {
             "cann\\yii\\log\\": "",
-            "app\\commands\\": "commands"
+            "cann\\yii\\log\\commands\\": "commands"
         }
+    },
+    "extra": {
+        "bootstrap": "cann\\yii\\log\\Bootstrap"
     }
 }

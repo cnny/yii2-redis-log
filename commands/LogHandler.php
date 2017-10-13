@@ -3,7 +3,7 @@
  * @author Cann(imcnny@gmail.com)
  */
 
-namespace app\commands;
+namespace cann\yii\log\commands;
 
 use Yii;
 use yii\console\Controller;
@@ -12,7 +12,7 @@ use yii\redis\Connection as redisConnection;
 use yii\db\Connection as dbConnection;
 use yii\helpers\Console;
 
-class LogHandlerController extends Controller
+class LogHandler extends Controller
 {
     const KEY_PREFIX = 'LOG:';
 
