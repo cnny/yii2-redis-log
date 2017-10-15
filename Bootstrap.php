@@ -8,7 +8,8 @@ namespace cann\yii\log;
 
 use yii\base\BootstrapInterface;
 use yii\base\Application;
-use cann\yii\log\LogHandler;
+use cann\yii\log\commands\LogHandler;
+use yii\console\Application as ConsoleApp;
 
 class Bootstrap implements BootstrapInterface
 {

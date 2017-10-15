@@ -59,10 +59,10 @@ class RedisTarget extends Target
                 'level'      => $level,
                 'prefix'     => $this->getMessagePrefix($message),
                 'category'   => $category,
-                'created_at' => date('Y-m-d H-i-s', $timestamp),
+                'created_at' => date('Y-m-d H:i:s', $timestamp),
             ]);
 
-            $this->redis->executeCommand('RPUSH', [self::KEY_PREFIX . $this->key, $content]);
+            $this->redis->rpush(self::KEY_PREFIX . $this->key, $content);
         }
     }
 }

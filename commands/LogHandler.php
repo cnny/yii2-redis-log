@@ -11,6 +11,7 @@ use yii\di\Instance;
 use yii\redis\Connection as redisConnection;
 use yii\db\Connection as dbConnection;
 use yii\helpers\Console;
+use cann\yii\log\CreateTable;
 
 class LogHandler extends Controller
 {
@@ -48,10 +49,12 @@ class LogHandler extends Controller
     {
         $tableName = $this->getTableName($logName);
 
-        $sql = "INSERT INTO $tableName ([[level]], [[category]], [[created_at]], [[prefix]], [[message]])
-                VALUES (:level, :category, :created_at, :prefix, :message)";
+        $hasTable = (bool) ($this->db->createCommand("SHOW TABLES LIKE '%log_" . $logName . "'")->queryOne());
 
-        $command = $this->db->createCommand($sql);
+        // Create Table If Not Exist
+        if (! $hasTable) {
+            CreateTable::run($tableName);
+        }
 
         $okCount = 0;
 
@@ -65,12 +68,12 @@ class LogHandler extends Controller
             }
 
             try {
-                $command->bindValues([
-                    ':level'      => $data['level'],
-                    ':category'   => $data['category'],
-                    ':prefix'     => $data['prefix'],
-                    ':message'    => $data['message'],
-                    ':created_at' => $data['created_at'],
+                $this->db->createCommand()->insert($tableName, [
+                    'level'      => $data['level'],
+                    'category'   => $data['category'],
+                    'prefix'     => $data['prefix'],
+                    'message'    => $data['message'],
+                    'created_at' => $data['created_at'],
                 ])->execute();
             } catch (yii\db\Exception $e) {
                 $this->redis->rpush($this->getFullLogName($logName), json_encode($data));
@@ -103,13 +106,8 @@ class LogHandler extends Controller
 
             $logName = $this->getLogNameByFullName($fullLogName);
 
-            try {
-                if ($okCount = self::actionExportToDb($logName)) {
-                    $result[$logName] = $okCount;
-                }
-            }
-            catch (Exception $e) {
-                echo $e->getMessage();
+            if ($okCount = self::actionExportToDb($logName)) {
+                $result[$logName] = $okCount;
             }
         }
 
