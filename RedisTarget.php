@@ -32,7 +32,8 @@ class RedisTarget extends Target
      * This method will initialize the [[redis]] property to make sure it refers to a valid Redis connection.
      * @throws InvalidConfigException if [[redis]] is invalid.
      */
-    public function init() {
+    public function init()
+    {
         parent::init();
         $this->redis = Instance::ensure($this->redis, Connection::className());
     }
@@ -40,7 +41,8 @@ class RedisTarget extends Target
     /**
      * Stores log messages to Redis.
      */
-    public function export() {
+    public function export()
+    {
         foreach ($this->messages as $message) {
 
             list($text, $level, $category, $timestamp) = $message;

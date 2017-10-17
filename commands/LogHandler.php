@@ -5,41 +5,48 @@
 
 namespace cann\yii\log\commands;
 
-use Yii;
 use yii\console\Controller;
 use yii\di\Instance;
 use yii\redis\Connection as redisConnection;
 use yii\db\Connection as dbConnection;
 use yii\helpers\Console;
 use cann\yii\log\CreateTable;
+use yii\helpers\Inflector;
 
 class LogHandler extends Controller
 {
     const KEY_PREFIX = 'LOG:';
 
     public $redis = 'redis';
-    public $db    = 'db';
+    public $db = 'db';
 
-    public function init() {
-        parent::init();
+    /**
+     * Set Components, Because Init() Can't Receive Options
+     */
+    public function beforeAction($action)
+    {
         $this->redis = Instance::ensure($this->redis, redisConnection::className());
         $this->db    = Instance::ensure($this->db, dbConnection::className());
     }
 
+    /**
+     * You can customize the component id，
+     * For example: yii log-handler/export-all-to-db --db=db2 --redis=redis2
+     */
+    public function options($actionID)
+    {
+        return ['redis', 'db'];
+    }
+
     protected function getTableName($logName)
     {
-        $logName = str_replace(self::KEY_PREFIX, '', $logName);
+        $logName = Inflector::camel2id(str_replace(self::KEY_PREFIX, '', $logName), '_');
         return "{{%log_{$logName}}}";
     }
 
     protected function getFullLogName($logName)
     {
         return self::KEY_PREFIX . $logName;
-    }
-
-    protected function getLogNameByFullName($fullLogName)
-    {
-        return str_replace(self::KEY_PREFIX, '', $fullLogName);
     }
 
     /**
@@ -104,7 +111,7 @@ class LogHandler extends Controller
 
         foreach ($fullLogNames as $fullLogName) {
 
-            $logName = $this->getLogNameByFullName($fullLogName);
+            $logName = str_replace(self::KEY_PREFIX, '', $fullLogName);
 
             if ($okCount = self::actionExportToDb($logName)) {
                 $result[$logName] = $okCount;
