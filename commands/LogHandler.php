@@ -27,6 +27,7 @@ class LogHandler extends Controller
     {
         $this->redis = Instance::ensure($this->redis, redisConnection::className());
         $this->db    = Instance::ensure($this->db, dbConnection::className());
+        return true;
     }
 
     /**
