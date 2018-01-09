@@ -53,7 +53,7 @@ class LogHandler extends Controller
     /**
      * Stores Redis log messages to DB.
      */
-    public function actionExportToDb($logName)
+    public function actionExportToDb($logName, $count = 1000)
     {
         $tableName = $this->getTableName($logName);
 
@@ -64,10 +64,9 @@ class LogHandler extends Controller
             CreateTable::run($tableName);
         }
 
-        $okCount = 0;
+        $insertArr = [];
 
-        // 每次处理1000条
-        for ($i = 0; $i < 1000; $i++) {
+        for ($i = 0; $i < $count; $i++) {
 
             $data = $this->redis->lpop($this->getFullLogName($logName));
 
@@ -75,21 +74,21 @@ class LogHandler extends Controller
                 break;
             }
 
-            try {
-                $this->db->createCommand()->insert($tableName, [
-                    'level'      => $data['level'],
-                    'category'   => $data['category'],
-                    'prefix'     => $data['prefix'],
-                    'message'    => $data['message'],
-                    'created_at' => $data['created_at'],
-                ])->execute();
-            } catch (yii\db\Exception $e) {
-                $this->redis->rpush($this->getFullLogName($logName), json_encode($data));
-                echo $e->getMessage() . PHP_EOL;
-                break;
-            }
+            $insertArr[] = [
+                'level'      => $data['level'],
+                'category'   => $data['category'],
+                'prefix'     => $data['prefix'],
+                'message'    => $data['message'],
+                'created_at' => $data['created_at'],
+            ];
+        }
 
-            $okCount++;
+        try {
+            $okCount = $this->db->createCommand()->batchInsert($tableName, [
+                'level', 'category', 'prefix', 'message', 'created_at'
+            ], $insertArr)->execute();
+        } catch (yii\db\Exception $e) {
+            // do nothing
         }
 
         echo $this->ansiFormat("Redis Log：{$logName} Is Complete。 Count：{$okCount}", Console::FG_GREEN) . PHP_EOL;
@@ -100,7 +99,7 @@ class LogHandler extends Controller
     /**
      * Stores All Redis log messages to DB.
      */
-    public function actionExportAllToDb()
+    public function actionExportAllToDb($count = 1000)
     {
         $fullLogNames = $this->redis->keys(self::KEY_PREFIX . '*');
 
@@ -114,7 +113,7 @@ class LogHandler extends Controller
 
             $logName = str_replace(self::KEY_PREFIX, '', $fullLogName);
 
-            if ($okCount = self::actionExportToDb($logName)) {
+            if ($okCount = self::actionExportToDb($logName, $count)) {
                 $result[$logName] = $okCount;
             }
         }
