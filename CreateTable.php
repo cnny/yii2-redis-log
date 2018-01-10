@@ -20,6 +20,6 @@ class CreateTable
             'prefix'     => $migration->string(50)->notNull(),
             'message'    => $migration->text(),
             'created_at' => $migration->timestamp()
-        ], "COLLATE='utf8mb4_unicode_ci");
+        ], "COLLATE='utf8mb4_unicode_ci'");
     }
 }
