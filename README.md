@@ -25,11 +25,11 @@
     ]
 ```
 
->`key`用于区分不同的Redis队列
+>`key` 用于区分不同的Redis队列
 
 ##### 将redis中的日志落地至数据库
 
-如果要将`key`为`default`的Redis Log导入数据库：
+如果要将 `key` 为`default`的Redis Log导入数据库：
 
 ```
     yii log-handler/export-to-db default
