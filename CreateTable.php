@@ -18,7 +18,7 @@ class CreateTable
             'level'      => $migration->string(200)->notNull(),
             'category'   => $migration->string(200)->notNull(),
             'prefix'     => $migration->string(50)->notNull(),
-            'message'    => $migration->text(),
+            'message'    => 'LONGTEXT',
             'created_at' => $migration->timestamp()
         ], "COLLATE='utf8mb4_unicode_ci'");
     }
